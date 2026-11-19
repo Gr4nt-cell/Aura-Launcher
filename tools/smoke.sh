@@ -28,3 +28,4 @@ adb shell wm size reset
 adb shell wm density reset
 adb logcat -d -s AndroidRuntime:E > out/android-crashes.txt
 if grep -q 'Process: com.gr4nt.auralauncher,' out/android-crashes.txt; then cat out/android-crashes.txt; exit 1; fi
+if [ ! -s out/android-crashes.txt ]; then printf '%s\n' 'PASS: no AndroidRuntime crash entries during smoke checks.' > out/android-crashes.txt; fi
