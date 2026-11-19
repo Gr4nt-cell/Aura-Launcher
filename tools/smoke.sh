@@ -7,15 +7,15 @@ adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard
 sleep 10
 timeout 150s adb shell am instrument -w com.gr4nt.auralauncher.test/com.gr4nt.auralauncher.AuraSmoke | tee out/android-tests.txt
-grep -q 'PASS: 14 Android integration checks' out/android-tests.txt
+grep -q 'PASS: 19 Android integration checks' out/android-tests.txt
 if grep -q 'FAIL:' out/android-tests.txt; then exit 1; fi
-for screen in Aura-drawer.png Aura-glass.png Aura-settings.png; do adb pull "/sdcard/Android/data/com.gr4nt.auralauncher/files/$screen" "out/$screen"; done
+for screen in Aura-drawer.png Aura-glass.png Aura-settings.png Aura-recents.png Aura-control-center.png Aura-notifications.png; do adb pull "/sdcard/Android/data/com.gr4nt.auralauncher/files/$screen" "out/$screen"; done
 wait_home() {
   echo "Checking rendered $2 layout"
   for attempt in $(seq 1 12); do
     timeout 15s adb shell uiautomator dump /sdcard/aura-layout.xml >/dev/null 2>&1 || true
     adb pull /sdcard/aura-layout.xml "out/$2-layout.xml" >/dev/null 2>&1 || true
-    if grep -q "text=\"$1\"" "out/$2-layout.xml" && grep -q 'content-desc="Aura workspace ready"' "out/$2-layout.xml"; then return 0; fi
+    if grep -q "$1" "out/$2-layout.xml" && grep -q 'content-desc="Aura workspace ready"' "out/$2-layout.xml"; then return 0; fi
     sleep 1
   done
   cat "out/$2-layout.xml" 2>/dev/null || true
@@ -23,19 +23,19 @@ wait_home() {
   exit 1
 }
 timeout 30s adb shell am start -W -n com.gr4nt.auralauncher/.LauncherActivity
-wait_home Aura phone
+wait_home 'content-desc="Aura home"' phone
 adb exec-out screencap -p > out/Aura-phone.png
 adb shell wm size 1200x1920
 adb shell wm density 240
 sleep 3
 timeout 30s adb shell am start -W -n com.gr4nt.auralauncher/.LauncherActivity
-wait_home Aura tablet
+wait_home 'content-desc="Aura home"' tablet
 adb exec-out screencap -p > out/Aura-tablet.png
 adb shell wm size 1600x1000
 adb shell wm density 160
 sleep 3
 timeout 30s adb shell am start -W -n com.gr4nt.auralauncher/.LauncherActivity
-wait_home AURA desktop
+wait_home 'text="AURA"' desktop
 adb exec-out screencap -p > out/Aura-desktop.png
 adb shell wm size reset
 adb shell wm density reset

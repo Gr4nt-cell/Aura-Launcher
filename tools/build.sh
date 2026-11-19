@@ -26,8 +26,9 @@ apksigner sign --ks "$KEYSTORE" --ks-pass "pass:$KS_PASS" --key-pass "pass:$KEY_
 apksigner verify --verbose out/Aura-Launcher.apk
 aapt2 dump badging out/Aura-Launcher.apk > out/apk-info.txt
 mkdir -p build/model-tests
-javac -d build/model-tests app/src/com/gr4nt/auralauncher/LayoutRules.java tests/LayoutRulesTest.java
+javac -d build/model-tests app/src/com/gr4nt/auralauncher/LayoutRules.java tests/LayoutRulesTest.java app/src/com/gr4nt/auralauncher/GestureRules.java app/src/com/gr4nt/auralauncher/WorkspaceRules.java tests/GestureRulesTest.java
 java -cp build/model-tests LayoutRulesTest | tee out/layout-tests.txt
+java -cp build/model-tests GestureRulesTest | tee out/gesture-tests.txt
 aapt2 link -o build/test.apk -I "$ANDROID_JAR" --manifest tests/AndroidManifest.xml
 javac -encoding UTF-8 --release 11 -cp "$ANDROID_JAR:build/classes" -d build/test-classes tests/AuraSmoke.java
 d8 --lib "$ANDROID_JAR" --classpath build/classes --min-api 26 --output build/test-dex $(find build/test-classes -name '*.class')

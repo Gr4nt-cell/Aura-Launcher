@@ -14,15 +14,21 @@ The uploaded ZIP is source for Kakashi’s Rust Launcher Mod v1.4 and its compan
 | Free widget resize and widget stacks | Android AppWidgetHost, host-frame resizing and stack cycling; providers retain their own constraints and licensing |
 | Widgets on App Vault / paid widgets | Not ported; provider/licensing requirements remain in force |
 | Stacked system recents, OriginOS transition, global iOS-style app animation | Not ported: controlled by Android’s system launcher/Quickstep and OEM runtime |
-| Recent apps gesture | Recent-launch shortcuts; not Android’s restricted task manager |
+| Recent apps gesture | Own five-slot momentum carousel; bottom swipe and two-second hold; app resume, own-history removal; optional consented local previews on Android 11+ |
 | Drawer blur | Aura drawer uses Home glass |
 | Home backup | Portable layout, folders, dock, labels and settings; widget providers must be rebound on a new device |
 | Tablet / desktop | Dedicated adaptive layouts, menu bar, keyboard/mouse controls, functional file-provider browser and external-display presentation |
 | Desktop app windows | Uses Android app launches; optional bounds request on freeform-capable devices; no universal window-manager replacement |
 
+## Added Home controls
+
+Classic and App Drawer modes, split swipe-down Control Center/Notifications, Home edge gestures, optional cross-app navigation helper, high-density icon loading, phone trackpad and user-selected desktop input method are implemented independently. The helper observes package names only and never retrieves window text. Notification content is displayed only after Android notification access is enabled. Screenshots are optional private cached previews; no network permission is declared.
+
+Native Android recents task deletion and OEM app transitions remain system features. Physical desktop display/IME focus and global navigation need device validation and appropriate Android grants.
+
 ## Verification
 
-Publication is gated on Android 8 and Android 15 emulator jobs. The build runs responsive geometry checks and Android integration checks for launch, app discovery, the three layouts, persistent dock/folders/names, backup handling, drawer, settings and glass screens. The emulator cannot establish that every third-party widget, icon pack, file provider or physical display works on every device. Those require device testing. No manufacturer-only feature is advertised as unlocked on generic Android.
+Publication is gated on Android 8 and Android 15 emulator jobs. The build runs 119 responsive geometry checks, 44 gesture/workspace checks and 19 Android integration checks for launch, app discovery, the three layouts, persistent dock/folders/names, backup handling, drawer, settings and glass screens. The emulator cannot establish that every third-party widget, icon pack, file provider or physical display works on every device. Those require device testing. No manufacturer-only feature is advertised as unlocked on generic Android.
 
 ## Sources inspected
 

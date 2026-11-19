@@ -1,0 +1,15 @@
+package com.gr4nt.auralauncher;
+import android.content.Context;
+import android.graphics.Color;
+import android.view.*;
+import android.widget.*;
+
+final class DesktopKeyboard {
+    static View create(Context c){LinearLayout keyboard=new LinearLayout(c);keyboard.setOrientation(LinearLayout.VERTICAL);keyboard.setBackgroundColor(0xff243449);keyboard.setPadding(4,5,4,5);final boolean[] shift={false},symbols={false};Runnable[] rebuild=new Runnable[1];rebuild[0]=()->{keyboard.removeAllViews();String[] rows=symbols[0]?new String[]{"1 2 3 4 5 6 7 8 9 0","@ # $ % & - + ( )","! ? / : ; , ."}:new String[]{"q w e r t y u i o p","a s d f g h j k l","z x c v b n m"};for(String row:rows){LinearLayout line=new LinearLayout(c);for(String letter:row.split(" ")){String label=shift[0]?letter.toUpperCase(java.util.Locale.ROOT):letter;Button key=key(c,label,()->AuraDesktopIME.type(label));line.addView(key,new LinearLayout.LayoutParams(0,px(c,45),1));}keyboard.addView(line);}
+        LinearLayout tools=new LinearLayout(c);tools.addView(key(c,symbols[0]?"ABC":"123",()->{symbols[0]=!symbols[0];rebuild[0].run();return true;}),new LinearLayout.LayoutParams(0,px(c,45),1));tools.addView(key(c,"⇧",()->{shift[0]=!shift[0];rebuild[0].run();return true;}),new LinearLayout.LayoutParams(0,px(c,45),1));tools.addView(key(c,"Space",()->AuraDesktopIME.type(" ")),new LinearLayout.LayoutParams(0,px(c,45),3));tools.addView(key(c,"⌫",()->AuraDesktopIME.key(KeyEvent.KEYCODE_DEL)),new LinearLayout.LayoutParams(0,px(c,45),1));tools.addView(key(c,"Enter",()->AuraDesktopIME.key(KeyEvent.KEYCODE_ENTER)),new LinearLayout.LayoutParams(0,px(c,45),1.5f));keyboard.addView(tools);
+        LinearLayout edits=new LinearLayout(c);edits.addView(key(c,"←",()->AuraDesktopIME.key(KeyEvent.KEYCODE_DPAD_LEFT)),new LinearLayout.LayoutParams(0,px(c,38),1));edits.addView(key(c,"→",()->AuraDesktopIME.key(KeyEvent.KEYCODE_DPAD_RIGHT)),new LinearLayout.LayoutParams(0,px(c,38),1));edits.addView(key(c,"Select all",()->AuraDesktopIME.edit(android.R.id.selectAll)),new LinearLayout.LayoutParams(0,px(c,38),2));edits.addView(key(c,"Copy",()->AuraDesktopIME.edit(android.R.id.copy)),new LinearLayout.LayoutParams(0,px(c,38),1.5f));edits.addView(key(c,"Paste",()->AuraDesktopIME.edit(android.R.id.paste)),new LinearLayout.LayoutParams(0,px(c,38),1.5f));keyboard.addView(edits);
+    };rebuild[0].run();return keyboard;}
+    interface KeyAction{boolean run();}
+    static Button key(Context c,String label,KeyAction action){Button button=new Button(c);button.setText(label);button.setTextSize(13);button.setTextColor(Color.WHITE);button.setAllCaps(false);button.setPadding(0,0,0,0);button.setMinWidth(0);button.setMinimumWidth(0);button.setFocusable(false);button.setOnClickListener(v->{if(!action.run())Toast.makeText(c,"Select Aura Desktop Keyboard and focus an editor on the desktop first.",Toast.LENGTH_SHORT).show();});return button;}
+    static int px(Context c,float value){return Math.round(value*c.getResources().getDisplayMetrics().density);}
+}

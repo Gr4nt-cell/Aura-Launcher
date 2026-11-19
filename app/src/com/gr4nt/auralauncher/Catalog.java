@@ -17,7 +17,7 @@ final class Catalog {
         apps.clear();byPackage.clear();PackageManager pm=owner.getPackageManager();
         for(ResolveInfo r:pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),0)){
             String pkg=r.activityInfo.packageName;if(pkg.equals(owner.getPackageName())||byPackage.containsKey(pkg))continue;
-            App app=new App();app.pkg=pkg;app.label=r.loadLabel(pm).toString();app.component=new ComponentName(pkg,r.activityInfo.name);app.icon=r.loadIcon(pm);apps.add(app);byPackage.put(pkg,app);
+            App app=new App();app.pkg=pkg;app.label=r.loadLabel(pm).toString();app.component=new ComponentName(pkg,r.activityInfo.name);try{int icon=r.getIconResource();app.icon=icon==0?r.loadIcon(pm):pm.getResourcesForApplication(r.activityInfo.applicationInfo).getDrawableForDensity(icon,Math.max(owner.getResources().getDisplayMetrics().densityDpi,android.util.DisplayMetrics.DENSITY_XXXHIGH),null);}catch(Exception e){app.icon=r.loadIcon(pm);}apps.add(app);byPackage.put(pkg,app);
         }
         apps.sort((a,b)->a.label.compareToIgnoreCase(b.label));loadPack();
     }

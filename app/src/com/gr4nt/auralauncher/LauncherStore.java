@@ -34,15 +34,15 @@ final class LauncherStore {
         JSONObject values=new JSONObject();
         for(Map.Entry<String,?> e:prefs.getAll().entrySet())if(e.getValue() instanceof String||e.getValue() instanceof Number||e.getValue() instanceof Boolean)values.put(e.getKey(),e.getValue());
         // Widget IDs are host/device specific and must be rebound after import.
-        values.remove("widgets");values.remove("wallpaper_uri");
+        values.remove("widgets");values.remove("wallpaper_uri");values.remove("helper_consent");values.remove("global_gestures");values.remove("recents_previews");values.remove("recent");
         JSONArray providers=new JSONArray();JSONArray widgets=array("widgets");for(int i=0;i<widgets.length();i++){JSONObject w=widgets.optJSONObject(i);if(w!=null)providers.put(w.optString("provider"));}
         return new JSONObject().put("app","Aura Launcher").put("version",1).put("settings",values).put("widget_providers_to_rebind",providers).toString(2);
     }
     void restore(String json) throws Exception {
         if(json.length()>1048576)throw new Exception("Backup is too large");JSONObject o=new JSONObject(json);
         if(!"Aura Launcher".equals(o.optString("app"))||o.optInt("version")!=1)throw new Exception("Not an Aura Launcher backup");
-        JSONObject v=o.getJSONObject("settings");String widgets=text("widgets","[]"),wallpaper=text("wallpaper_uri","");SharedPreferences.Editor e=prefs.edit().clear().putString("widgets",widgets).putString("wallpaper_uri",wallpaper);
-        for(Iterator<String> it=v.keys();it.hasNext();){String k=it.next();if("widgets".equals(k)||"wallpaper_uri".equals(k))continue;Object x=v.get(k);if(x instanceof Boolean)e.putBoolean(k,(Boolean)x);else if(x instanceof Number)e.putInt(k,boundedNumber(k,((Number)x).intValue()));else if(x instanceof String&&((String)x).length()<=262144)e.putString(k,(String)x);}
+        JSONObject v=o.getJSONObject("settings");String widgets=text("widgets","[]"),wallpaper=text("wallpaper_uri","");SharedPreferences.Editor e=prefs.edit().clear().putString("widgets",widgets).putString("wallpaper_uri",wallpaper).putBoolean("helper_consent",flag("helper_consent",false)).putBoolean("global_gestures",flag("global_gestures",false)).putBoolean("recents_previews",flag("recents_previews",true)).putString("recent",text("recent","[]"));
+        for(Iterator<String> it=v.keys();it.hasNext();){String k=it.next();if("widgets".equals(k)||"wallpaper_uri".equals(k)||"helper_consent".equals(k)||"global_gestures".equals(k)||"recents_previews".equals(k)||"recent".equals(k))continue;Object x=v.get(k);if(x instanceof Boolean)e.putBoolean(k,(Boolean)x);else if(x instanceof Number)e.putInt(k,boundedNumber(k,((Number)x).intValue()));else if(x instanceof String&&((String)x).length()<=262144)e.putString(k,(String)x);}
         e.apply();
     }
     static int boundedNumber(String key,int value){

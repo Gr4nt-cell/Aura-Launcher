@@ -1,0 +1,5 @@
+<resources>
+    <string name="gesture_service_name">Aura navigation and desktop control</string>
+    <string name="gesture_service_description">Optional edge Back/Home gestures, app-name history and on-device recent-app previews, plus pointer clicks on an external display. Aura does not retrieve window text or upload screenshots. Enable only the options you want in Aura settings.</string>
+    <string name="desktop_keyboard_name">Aura Desktop Keyboard</string>
+</resources>
