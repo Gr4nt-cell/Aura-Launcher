@@ -9,6 +9,37 @@ concurrency:
   group: aura-launcher-build
   cancel-in-progress: true
 jobs:
+  android8:
+    name: Android 8 compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install build tools
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          sudo chmod 666 /dev/kvm
+      - name: Build compatibility APK
+        run: bash tools/build.sh
+      - name: Test older Android rendering and APIs
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 26
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: bash tools/smoke.sh
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -62,9 +93,19 @@ jobs:
           git archive --format=zip --prefix=Aura-Launcher/ HEAD > out/Aura-Launcher-source.zip
           cp docs/FEATURES.md out/FEATURES.md
           cp README.md out/README.md
-      - name: Publish installable preview
+      - name: Stage verified Android 15 preview
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG=build-${{ github.run_number }}
-          gh release create "$TAG" out/* --target '${{ github.sha }}' --prerelease --title "Aura Launcher 1.0.${{ github.run_number }} preview" --notes-file README.md
+          gh release create "$TAG" out/* --target '${{ github.sha }}' --prerelease --draft --title "Aura Launcher 1.0.${{ github.run_number }} preview" --notes-file README.md
+  publish:
+    name: Publish after both Android checks
+    needs: [build, android8]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish verified preview assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release edit build-${{ github.run_number }} --draft=false
