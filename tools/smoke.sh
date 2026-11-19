@@ -12,6 +12,12 @@ adb shell am force-stop com.gr4nt.auralauncher
 adb shell am start -n com.gr4nt.auralauncher/.LauncherActivity
 sleep 2
 adb exec-out screencap -p > out/Aura-phone.png
+adb shell wm size 1200x1920
+adb shell wm density 240
+sleep 3
+adb shell am start -n com.gr4nt.auralauncher/.LauncherActivity
+sleep 2
+adb exec-out screencap -p > out/Aura-tablet.png
 adb shell wm size 1600x1000
 adb shell wm density 160
 sleep 3

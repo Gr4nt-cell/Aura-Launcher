@@ -28,7 +28,7 @@ public final class AuraSmoke extends Instrumentation {
         runOnMainSync(()->{activity.store.put("layout","phone");activity.render();activity.drawer(0);});waitForIdleSync();check(!activity.dialogs.isEmpty(),"App drawer opens");
         runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();activity.glassSettings("dock");});waitForIdleSync();check(!activity.dialogs.isEmpty(),"Glass controls open");
         runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();activity.settings();});waitForIdleSync();check(!activity.dialogs.isEmpty(),"Settings opens");
-        runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();});
+        runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();activity.store.put("layout","auto");activity.render();});
         report.putString("stream","PASS: "+assertions+" Android integration checks\n");finish(Activity.RESULT_OK,report);
     }catch(Throwable failure){report.putString("stream","FAIL: "+failure.toString()+"\n");finish(Activity.RESULT_CANCELED,report);}}
 }
