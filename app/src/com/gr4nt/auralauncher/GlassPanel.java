@@ -40,7 +40,7 @@ final class GlassPanel extends FrameLayout {
         if(Build.VERSION.SDK_INT>=31)material.setRenderEffect(RenderEffect.createBlurEffect(Math.max(0.1f,a.dp(a.store.number(group+"_blur",35))/2f),Math.max(0.1f,a.dp(a.store.number(group+"_blur",35))/2f),Shader.TileMode.CLAMP));
         addView(material,new LayoutParams(0,0));
         View edges=new View(c){final Paint p=new Paint(3);@Override protected void onDraw(Canvas canvas){
-            int edge=owner.store.number(prefix+"_edge",35),soft=owner.store.number(prefix+"_edge_feather",40),light=owner.store.number(prefix+"_light",30),thickness=owner.store.number(prefix+"_thickness",22);
+            if(cornerRadius==0)return;int edge=owner.store.number(prefix+"_edge",35),soft=owner.store.number(prefix+"_edge_feather",40),light=owner.store.number(prefix+"_light",30),thickness=owner.store.number(prefix+"_thickness",22);
             float r=owner.dp(cornerRadius);
             p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(owner.dp(0.5f+thickness/45f));p.setColor(Color.argb(LayoutRules.clamp(edge+80-soft/2,0,220),255,255,255));
             canvas.drawRoundRect(1,1,getWidth()-1,getHeight()-1,r,r,p);
