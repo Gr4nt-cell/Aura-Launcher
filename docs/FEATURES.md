@@ -22,10 +22,12 @@ The uploaded ZIP is source for Kakashi’s Rust Launcher Mod v1.4 and its compan
 
 ## Verification
 
-The build runs responsive geometry checks and Android integration checks for launch, app discovery, the three layouts, persistent dock/folders/names, backup handling, drawer, settings and glass screens. The emulator cannot establish that every third-party widget, icon pack, file provider or physical display works on every device. Those require device testing. No manufacturer-only feature is advertised as unlocked on generic Android.
+Publication is gated on Android 8 and Android 15 emulator jobs. The build runs responsive geometry checks and Android integration checks for launch, app discovery, the three layouts, persistent dock/folders/names, backup handling, drawer, settings and glass screens. The emulator cannot establish that every third-party widget, icon pack, file provider or physical display works on every device. Those require device testing. No manufacturer-only feature is advertised as unlocked on generic Android.
 
 ## Sources inspected
 
 - Uploaded HyperOS-Rust-Launcher-Mod-1.4.zip; AGPL-3.0, existing source and notices inspected locally.
 - https://github.com/Mods-Center/HyperOS-Rust-Launcher-Mod/releases/tag/v1.4
 - https://github.com/Mods-Center/HyperOS-Launcher (v7.5 feature list and changelog).
+
+The Android 15 emulator fixture disables its unused stock Pixel Launcher after selecting Aura as Home to prevent an unrelated stock-Quickstep ANR from blocking UI checks. This is confined to CI; the installed Aura APK does not disable any app.

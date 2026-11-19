@@ -3,6 +3,11 @@ set -euo pipefail
 adb install -r out/Aura-Launcher.apk
 adb install -r build/Aura-tests.apk
 adb shell cmd package set-home-activity com.gr4nt.auralauncher/.LauncherActivity
+# Emulator fixture only: prevent the unused stock Quickstep from blocking captures with an ANR.
+# No such command exists in the installed Aura app.
+if [ "$(adb shell getprop ro.build.version.sdk | tr -d '\r')" -ge 35 ]; then
+  adb shell pm disable-user --user 0 com.google.android.apps.nexuslauncher >/dev/null 2>&1 || true
+fi
 adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard
 timeout 150s adb shell am instrument -w com.gr4nt.auralauncher.test/com.gr4nt.auralauncher.AuraSmoke | tee out/android-tests.txt
