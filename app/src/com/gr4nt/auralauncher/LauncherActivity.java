@@ -71,7 +71,7 @@ public final class LauncherActivity extends Activity {
 
     void render(){if(root==null||isDestroyed())return;renderGeneration++;mode=LayoutRules.mode(widthDp(),store.text("layout","auto"));if(Build.VERSION.SDK_INT>=30){WindowInsetsController controls=getWindow().getInsetsController();if(controls!=null){if(mode.equals("desktop"))controls.hide(WindowInsets.Type.statusBars());else controls.show(WindowInsets.Type.statusBars());}}else getWindow().getDecorView().setSystemUiVisibility(mode.equals("desktop")?View.SYSTEM_UI_FLAG_FULLSCREEN:0);clocks.clear();buildSurface(this,root,mode,0);if(presentation!=null&&presentation.isShowing()){FrameLayout surface=new FrameLayout(presentation.getContext());presentation.setContentView(surface);buildSurface(presentation.getContext(),surface,"desktop",presentation.getDisplay().getDisplayId());}}
     void buildSurface(Context c,FrameLayout surface,String layout,int display){
-        surface.removeAllViews();boolean desktop=layout.equals("desktop");boolean primary=display==0;
+        surface.removeAllViews();surface.setContentDescription(catalog.apps.isEmpty()?"Aura workspace loading":"Aura workspace ready");boolean desktop=layout.equals("desktop");boolean primary=display==0;
         View background=new View(c){final Paint p=new Paint(3);@Override protected void onDraw(Canvas canvas){paintWallpaper(canvas,getWidth(),getHeight(),p);}};surface.addView(background,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout body=column(c);body.setPadding(0,primary?insetTop:0,0,primary?insetBottom:0);surface.addView(body,new FrameLayout.LayoutParams(-1,-1));
         if(desktop)body.addView(menuBar(c,display),new LinearLayout.LayoutParams(-1,dp(34)));

@@ -30,4 +30,4 @@ Publication is gated on Android 8 and Android 15 emulator jobs. The build runs r
 - https://github.com/Mods-Center/HyperOS-Rust-Launcher-Mod/releases/tag/v1.4
 - https://github.com/Mods-Center/HyperOS-Launcher (v7.5 feature list and changelog).
 
-The Android 15 emulator fixture disables its unused stock Pixel Launcher after selecting Aura as Home to prevent an unrelated stock-Quickstep ANR from blocking UI checks. This is confined to CI; the installed Aura APK does not disable any app.
+The emulator jobs use extra CPU/RAM and allow Android to settle before interaction checks. They do not disable the stock launcher. The rendered-layout check waits for Aura’s ready workspace rather than taking a screenshot after a fixed delay.

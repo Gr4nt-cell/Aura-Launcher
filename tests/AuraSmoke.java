@@ -11,11 +11,12 @@ import android.graphics.Bitmap;
 
 public final class AuraSmoke extends Instrumentation {
     int assertions=0;
-    void check(boolean ok,String message){assertions++;if(!ok)throw new AssertionError(message);}
+    void stage(String message){Bundle status=new Bundle();status.putString("stream","STEP: "+message+"\n");sendStatus(0,status);}
+    void check(boolean ok,String message){assertions++;if(!ok)throw new AssertionError(message);stage("Passed: "+message);}
     boolean contains(View view,String needle){if(view instanceof TextView&&((TextView)view).getText().toString().contains(needle))return true;if(view instanceof ViewGroup){ViewGroup g=(ViewGroup)view;for(int i=0;i<g.getChildCount();i++)if(contains(g.getChildAt(i),needle))return true;}return false;}
-    void screenshot(String name)throws Exception{Thread.sleep(250);Bitmap bitmap=getUiAutomation().takeScreenshot();if(bitmap==null)throw new IOException("Screenshot unavailable");try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getExternalFilesDir(null),name))){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}bitmap.recycle();}
+    void screenshot(String name)throws Exception{stage("Capturing "+name);Thread.sleep(250);Bitmap bitmap=getUiAutomation().takeScreenshot();if(bitmap==null)throw new IOException("Screenshot unavailable");try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getExternalFilesDir(null),name))){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}bitmap.recycle();}
     @Override public void onCreate(Bundle arguments){super.onCreate(arguments);start();}
-    @Override public void onStart(){Bundle report=new Bundle();try{
+    @Override public void onStart(){Bundle report=new Bundle();try{stage("Starting Aura runtime checks");
         LauncherActivity activity=(LauncherActivity)startActivitySync(new Intent().setClassName(getTargetContext(),"com.gr4nt.auralauncher.LauncherActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         for(int i=0;i<40;i++){Thread.sleep(100);waitForIdleSync();if(!activity.catalog.apps.isEmpty())break;}
         check(!activity.catalog.apps.isEmpty(),"Installed apps must be discovered");
