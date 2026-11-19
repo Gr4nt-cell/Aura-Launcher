@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.gr4nt.auralauncher">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <queries>
+        <intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent>
+        <intent><action android:name="org.adw.launcher.THEMES"/></intent>
+        <intent><action android:name="com.novalauncher.THEME"/></intent>
+    </queries>
+    <application android:label="Aura Launcher" android:icon="@drawable/ic_aura" android:theme="@style/AuraTheme" android:allowBackup="false" android:resizeableActivity="true" android:supportsRtl="true">
+        <activity android:name=".LauncherActivity" android:exported="true" android:launchMode="singleTask" android:stateNotNeeded="false" android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+        </activity>
+    </application>
+</manifest>

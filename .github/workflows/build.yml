@@ -1,0 +1,67 @@
+name: Build Aura Launcher
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: aura-launcher-build
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android build tools
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          sudo chmod 666 /dev/kvm
+      - name: Prepare optional production signing
+        env:
+          SIGNING_KEY: ${{ secrets.AURA_KEYSTORE_BASE64 }}
+          SIGNING_PASS: ${{ secrets.AURA_KEYSTORE_PASSWORD }}
+          SIGNING_ALIAS: ${{ secrets.AURA_KEY_ALIAS }}
+          SIGNING_KEY_PASS: ${{ secrets.AURA_KEY_PASSWORD }}
+        run: |
+          if [ -n "$SIGNING_KEY" ]; then
+            printf '%s' "$SIGNING_KEY" | base64 -d > "$RUNNER_TEMP/aura-release.keystore"
+            echo "KEYSTORE=$RUNNER_TEMP/aura-release.keystore" >> "$GITHUB_ENV"
+            echo "KS_PASS=$SIGNING_PASS" >> "$GITHUB_ENV"
+            echo "KS_ALIAS=$SIGNING_ALIAS" >> "$GITHUB_ENV"
+            echo "KEY_PASS=$SIGNING_KEY_PASS" >> "$GITHUB_ENV"
+          fi
+      - name: Build and verify APK
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: 1.0.${{ github.run_number }}
+        run: bash tools/build.sh
+      - name: Android runtime checks
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: bash tools/smoke.sh
+      - name: Package corresponding source
+        run: |
+          git archive --format=zip --prefix=Aura-Launcher/ HEAD > out/Aura-Launcher-source.zip
+          cp docs/FEATURES.md out/FEATURES.md
+          cp README.md out/README.md
+      - name: Publish installable preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=build-${{ github.run_number }}
+          gh release create "$TAG" out/* --target '${{ github.sha }}' --prerelease --title "Aura Launcher 1.0.${{ github.run_number }} preview" --notes-file README.md
