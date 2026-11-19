@@ -16,7 +16,7 @@ final class LauncherStore {
     void put(String k,String v) { prefs.edit().putString(k,v).apply(); }
     JSONArray array(String key) { try { return new JSONArray(text(key,"[]")); }catch(Exception e){return new JSONArray();} }
     JSONObject object(String key) { try { return new JSONObject(text(key,"{}")); }catch(Exception e){return new JSONObject();} }
-    List<String> list(String key) { JSONArray a=array(key);List<String> r=new ArrayList<>();for(int i=0;i<a.length();i++)r.add(a.optString(i));return r; }
+    List<String> list(String key) { JSONArray a=array(key);List<String> r=new ArrayList<>();int limit=key.equals("dock")?8:key.startsWith("home_")?128:512;for(int i=0;i<a.length()&&r.size()<limit;i++){String value=a.optString(i);if(!value.isEmpty()&&!r.contains(value))r.add(value);}return r; }
     void list(String key,List<String> values) { put(key,new JSONArray(values).toString()); }
     boolean hidden(String pkg) { return list("hidden").contains(pkg); }
     String name(String pkg,String fallback) { return object("names").optString(pkg,fallback); }
@@ -42,7 +42,17 @@ final class LauncherStore {
         if(json.length()>1048576)throw new Exception("Backup is too large");JSONObject o=new JSONObject(json);
         if(!"Aura Launcher".equals(o.optString("app"))||o.optInt("version")!=1)throw new Exception("Not an Aura Launcher backup");
         JSONObject v=o.getJSONObject("settings");SharedPreferences.Editor e=prefs.edit();
-        for(Iterator<String> it=v.keys();it.hasNext();){String k=it.next();if("widgets".equals(k)||"wallpaper_uri".equals(k))continue;Object x=v.get(k);if(x instanceof Boolean)e.putBoolean(k,(Boolean)x);else if(x instanceof Number)e.putInt(k,((Number)x).intValue());else if(x instanceof String&&((String)x).length()<=262144)e.putString(k,(String)x);}
+        for(Iterator<String> it=v.keys();it.hasNext();){String k=it.next();if("widgets".equals(k)||"wallpaper_uri".equals(k))continue;Object x=v.get(k);if(x instanceof Boolean)e.putBoolean(k,(Boolean)x);else if(x instanceof Number)e.putInt(k,boundedNumber(k,((Number)x).intValue()));else if(x instanceof String&&((String)x).length()<=262144)e.putString(k,(String)x);}
         e.apply();
+    }
+    static int boundedNumber(String key,int value){
+        if(key.equals("icon_size"))return LayoutRules.clamp(value,36,86);
+        if(key.equals("columns"))return LayoutRules.clamp(value,0,12);
+        if(key.endsWith("_radius"))return LayoutRules.clamp(value,0,60);
+        if(key.equals("dock_height"))return LayoutRules.clamp(value,56,110);
+        if(key.equals("dock_margin"))return LayoutRules.clamp(value,8,64);
+        if(key.equals("dock_icon_offset"))return LayoutRules.clamp(value,-20,20);
+        if(key.equals("search_above_gap")||key.equals("search_below_gap"))return LayoutRules.clamp(value,0,40);
+        return LayoutRules.clamp(value,0,200);
     }
 }
