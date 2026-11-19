@@ -15,6 +15,8 @@ Install `Aura-Launcher.apk`, open it and choose **Default Home app** from settin
 - Own momentum-scrolling recent-app carousel uses the iOS Dialer favorites profile: center scale 1, neighbors .84 and .66, with opacity 1/.85/.55. Cards resume apps; removing a card clears Aura history, not the Android task.
 - Phone keyboard/trackpad controls for a connected desktop display. Select **Aura Desktop Keyboard** for typing into the focused external editor. Optional helper enables cross-app display clicks/swipes on Android 11+; cursor overlay needs Android’s overlay grant. Aura’s own desktop surface also accepts local pointer input.
 
+The optional helper’s bottom gesture strip sits just above Android’s navigation area, so it does not compete for mandatory system-bar touches. Android’s navigation remains available as a fallback.
+
 For cross-app gestures, open Aura settings → Cross-app gesture helper, read the disclosure, then enable the service in Android. It observes foreground package names, not window text. Optional Android 11+ previews are stored only in private cache, expire after 12 hours and are erased when the helper stops. Secure windows show a placeholder. Backup/import cannot grant helper consent or export previews/history. The keyboard commits only keys explicitly pressed and does not read or store editor text.
 
 Control Center changes media volume, requests torch access, controls authorized media sessions and opens real Wi-Fi/Bluetooth/data settings. Global brightness/rotation require Android’s modify-settings grant; without it brightness is explicitly Aura-only.
