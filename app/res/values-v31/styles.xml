@@ -1,0 +1,7 @@
+<resources>
+    <style name="AuraTheme" parent="AuraBase">
+        <item name="android:windowSplashScreenBackground">#193E4D</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_aura</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#243D54</item>
+    </style>
+</resources>

@@ -36,7 +36,7 @@ public final class AuraSmoke extends Instrumentation {
         screenshot("Aura-glass.png");
         runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();activity.settings();});waitForIdleSync();check(!activity.dialogs.isEmpty(),"Settings opens");
         screenshot("Aura-settings.png");
-        runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();activity.store.put("layout","auto");activity.render();});
+        runOnMainSync(()->{for(Dialog d:new ArrayList<>(activity.dialogs))d.dismiss();activity.store.prefs.edit().putString("layout","auto").commit();activity.render();});
         report.putString("stream","PASS: "+assertions+" Android integration checks\n");finish(Activity.RESULT_OK,report);
     }catch(Throwable failure){report.putString("stream","FAIL: "+failure.toString()+"\n");finish(Activity.RESULT_CANCELED,report);}}
 }

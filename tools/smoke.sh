@@ -9,21 +9,31 @@ timeout 150s adb shell am instrument -w com.gr4nt.auralauncher.test/com.gr4nt.au
 grep -q 'PASS: 14 Android integration checks' out/android-tests.txt
 if grep -q 'FAIL:' out/android-tests.txt; then exit 1; fi
 for screen in Aura-drawer.png Aura-glass.png Aura-settings.png; do adb pull "/sdcard/Android/data/com.gr4nt.auralauncher/files/$screen" "out/$screen"; done
+wait_home() {
+  for attempt in $(seq 1 12); do
+    timeout 15s adb shell uiautomator dump /sdcard/aura-layout.xml >/dev/null 2>&1 || true
+    adb pull /sdcard/aura-layout.xml "out/$2-layout.xml" >/dev/null 2>&1 || true
+    if grep -q "text=\"$1\"" "out/$2-layout.xml" && grep -q 'content-desc="Calendar"' "out/$2-layout.xml"; then return 0; fi
+    sleep 1
+  done
+  echo "FAIL: $2 Home did not render the expected responsive layout"
+  exit 1
+}
 adb shell am force-stop com.gr4nt.auralauncher
-adb shell am start -n com.gr4nt.auralauncher/.LauncherActivity
-sleep 2
+adb shell am start -W -n com.gr4nt.auralauncher/.LauncherActivity
+wait_home Aura phone
 adb exec-out screencap -p > out/Aura-phone.png
 adb shell wm size 1200x1920
 adb shell wm density 240
 sleep 3
-adb shell am start -n com.gr4nt.auralauncher/.LauncherActivity
-sleep 2
+adb shell am start -W -n com.gr4nt.auralauncher/.LauncherActivity
+wait_home Aura tablet
 adb exec-out screencap -p > out/Aura-tablet.png
 adb shell wm size 1600x1000
 adb shell wm density 160
 sleep 3
-adb shell am start -n com.gr4nt.auralauncher/.LauncherActivity
-sleep 2
+adb shell am start -W -n com.gr4nt.auralauncher/.LauncherActivity
+wait_home AURA desktop
 adb exec-out screencap -p > out/Aura-desktop.png
 adb shell wm size reset
 adb shell wm density reset

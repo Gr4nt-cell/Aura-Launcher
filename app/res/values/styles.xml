@@ -1,5 +1,5 @@
 <resources>
-    <style name="AuraTheme" parent="android:style/Theme.Material.NoActionBar">
+    <style name="AuraBase" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:colorAccent">#9DDDD0</item>
         <item name="android:windowActionModeOverlay">true</item>
@@ -10,4 +10,5 @@
         <item name="android:windowBackground">#18283C</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
+    <style name="AuraTheme" parent="AuraBase"/>
 </resources>
