@@ -41,7 +41,7 @@ final class LauncherStore {
     void restore(String json) throws Exception {
         if(json.length()>1048576)throw new Exception("Backup is too large");JSONObject o=new JSONObject(json);
         if(!"Aura Launcher".equals(o.optString("app"))||o.optInt("version")!=1)throw new Exception("Not an Aura Launcher backup");
-        JSONObject v=o.getJSONObject("settings");SharedPreferences.Editor e=prefs.edit();
+        JSONObject v=o.getJSONObject("settings");String widgets=text("widgets","[]"),wallpaper=text("wallpaper_uri","");SharedPreferences.Editor e=prefs.edit().clear().putString("widgets",widgets).putString("wallpaper_uri",wallpaper);
         for(Iterator<String> it=v.keys();it.hasNext();){String k=it.next();if("widgets".equals(k)||"wallpaper_uri".equals(k))continue;Object x=v.get(k);if(x instanceof Boolean)e.putBoolean(k,(Boolean)x);else if(x instanceof Number)e.putInt(k,boundedNumber(k,((Number)x).intValue()));else if(x instanceof String&&((String)x).length()<=262144)e.putString(k,(String)x);}
         e.apply();
     }

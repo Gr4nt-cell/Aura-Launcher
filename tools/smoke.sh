@@ -6,8 +6,9 @@ adb shell cmd package set-home-activity com.gr4nt.auralauncher/.LauncherActivity
 adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard
 timeout 150s adb shell am instrument -w com.gr4nt.auralauncher.test/com.gr4nt.auralauncher.AuraSmoke | tee out/android-tests.txt
-grep -q 'PASS: 13 Android integration checks' out/android-tests.txt
+grep -q 'PASS: 14 Android integration checks' out/android-tests.txt
 if grep -q 'FAIL:' out/android-tests.txt; then exit 1; fi
+for screen in Aura-drawer.png Aura-glass.png Aura-settings.png; do adb pull "/sdcard/Android/data/com.gr4nt.auralauncher/files/$screen" "out/$screen"; done
 adb shell am force-stop com.gr4nt.auralauncher
 adb shell am start -n com.gr4nt.auralauncher/.LauncherActivity
 sleep 2

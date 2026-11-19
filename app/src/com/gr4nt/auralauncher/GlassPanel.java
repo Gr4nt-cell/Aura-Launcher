@@ -12,16 +12,19 @@ final class GlassPanel extends FrameLayout {
     static final String[] PARAMETERS={"blur","luminance","saturation","brightness","alpha","refraction","thickness","bg_saturation","bg_brightness","burn","edge","edge_feather","reflection_offset","light","darker"};
     static final String[] LABELS={"Blur","Luminance","Saturation","Brightness","Opacity","Refraction","Thickness","Background saturation","Background brightness","Burn","Edge","Edge softness","Reflection position","Highlight","Darkening"};
     static final int[] DEFAULTS={35,105,110,100,42,100,22,100,100,8,35,40,35,30,10};
-    final LauncherActivity owner;final String prefix;
+    final LauncherActivity owner;final String prefix;final int cornerRadius;
     GlassPanel(LauncherActivity a,Context c,String group) {
+        this(a,c,group,-1);
+    }
+    GlassPanel(LauncherActivity a,Context c,String group,int radiusOverride) {
         super(c);owner=a;prefix=group;setClipToOutline(true);
-        int radius=a.store.number(group+"_radius",group.equals("dock")?30:24);
+        int radius=radiusOverride<0?a.store.number(group+"_radius",group.equals("dock")?30:24):radiusOverride;cornerRadius=radius;
         GradientDrawable shape=new GradientDrawable();shape.setColor(Color.TRANSPARENT);shape.setCornerRadius(a.dp(radius));setBackground(shape);
         View material=new View(c){
             final Paint paint=new Paint(3);final int[] location=new int[2];
             @Override protected void onDraw(Canvas canvas){
                 int[] v=new int[PARAMETERS.length];for(int i=0;i<v.length;i++)v[i]=LayoutRules.clamp(owner.store.number(prefix+"_"+PARAMETERS[i],DEFAULTS[i]),0,200);
-                getLocationInWindow(location);canvas.save();
+                getLocationOnScreen(location);canvas.save();
                 float refract=1+(v[5]-100)/1600f;canvas.scale(refract,refract,getWidth()/2f,getHeight()/2f);
                 canvas.translate(-location[0],-location[1]);
                 ColorMatrix cm=new ColorMatrix();cm.setSaturation(v[2]*v[7]/10000f);
@@ -38,7 +41,7 @@ final class GlassPanel extends FrameLayout {
         addView(material,new LayoutParams(0,0));
         View edges=new View(c){final Paint p=new Paint(3);@Override protected void onDraw(Canvas canvas){
             int edge=owner.store.number(prefix+"_edge",35),soft=owner.store.number(prefix+"_edge_feather",40),light=owner.store.number(prefix+"_light",30),thickness=owner.store.number(prefix+"_thickness",22);
-            float r=owner.dp(owner.store.number(prefix+"_radius",prefix.equals("dock")?30:24));
+            float r=owner.dp(cornerRadius);
             p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(owner.dp(0.5f+thickness/45f));p.setColor(Color.argb(LayoutRules.clamp(edge+80-soft/2,0,220),255,255,255));
             canvas.drawRoundRect(1,1,getWidth()-1,getHeight()-1,r,r,p);
             p.setStyle(Paint.Style.FILL);float y=getHeight()*owner.store.number(prefix+"_reflection_offset",35)/200f;
